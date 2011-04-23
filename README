@@ -1,0 +1,40 @@
+Stardog Connection Pool API
+
+This is a simple connection pool API to wrap the native Stardog API. The repository contains the necessary files for using it as an eclipse project. You will need to modify the classpath references to point to your local copy of the Stardog library. Currently no build scripts are provided (it is likely for a future update).
+
+Requirements:
+stardog-{version}.jar	-	Originally written and compiled against 0.4.10
+JUnit			-	Written against JUnit 4. Required for test case
+Java			- 	Requires 1.6
+
+Notes on the test case:
+You will need to configure the "stardog.home" system property and create a Stardog database named "testDB" in order to run the test.
+
+The max pool size will cap the number of simultaneous open connections. Connect calls to the pool will block until a connection is available. The default maximum is 50 connections.
+
+The pool aggressiveness is a rough measure of how aggressively unused connections are closed. Good values for pool aggressiveness will vary depending on your application, but expect to stay between 1000 and 20000.
+
+Quick Start:
+The connection pool works by using a ConnectionConfiguration that you set to open connections to the Stardog database. All standard Stardog configuration steps need to be performed as if you were directly using the connection API of Stardog (e.g. set stardog.home, create the database, etc.).
+
+To setup a pool:
+
+ConnectionConfiguration config = ConnectionConfiguration.to("myStardogDatabase");
+//Additional configuration steps here
+StardogConnectionPool scp = new StardogConnectionPool();
+scp.setConnConfig(config);
+//To configure a custom pool size (default 50):
+scp.setMaxPoolSize(100);
+//To configure how aggressively unused connections are closed (default 10000):
+scp.setPoolAggressiveness(5000);
+
+To use a pool:
+
+scp.connect();
+//query, delete, update, etc.
+//always close to release back to the pool
+scp.close();
+
+To terminate a pool and free resources:
+
+scp.terminatePool();
